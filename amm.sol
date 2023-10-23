@@ -85,3 +85,18 @@ contract AMMExample is IUniswapV2Callee, Ownable {
         (ethReserve, tokenReserve) = pair.token0() == address(token) ? (reserve1, reserve0) : (reserve0, reserve1);
     }
 }
+function addLiquidityToPool(uint256 amount) external onlyOwner {
+    require(totalSupply > 0, "No total liquidity supply");
+
+    uint256 amount1 = (amount * token1.balanceOf(address(this))) / totalSupply;
+    uint256 amount2 = (amount * token2.balanceOf(address(this))) / totalSupply;
+
+    require(balances[msg.sender] >= amount, "Insufficient liquidity balance");
+
+    require(token1.transfer(msg.sender, amount1), "Transfer of token1 failed");
+    require(token2.transfer(msg.sender, amount2), "Transfer of token2 failed");
+
+    totalSupply -= amount;
+    balances[msg.sender] -= amount;
+}
+
