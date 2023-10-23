@@ -20,23 +20,18 @@ contract AMMExample is IUniswapV2Callee, Ownable {
         pair = IUniswapV2Pair(uniswapV2Factory.createPair(address(token), IUniswapV2Factory(_uniswapV2Factory).WETH()));
     }
 
-    // Price Oracle kullanımı için arayüz belirtildi.
     IPriceOracle public priceOracle = IPriceOracle(priceOracleAddress);
 
-    // Örnek bir PriceOracle arayüzü
     interface IPriceOracle {
         function getLatestPrice() external view returns (int);
     }
 
-    // Uniswap swap işlemi için arayüz belirtildi.
     IUniswapRouterV2 public uniswapRouter;
     
-    // UniswapRouterV2'nin arayüzü
     interface IUniswapRouterV2 {
         function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts);
     }
 
-    // Swap işlemi için path belirtildi.
     address[] public path;
 
     function setUniswapRouter(address _router) external onlyOwner {
@@ -51,7 +46,6 @@ contract AMMExample is IUniswapV2Callee, Ownable {
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
         
         int latestPrice = priceOracle.getLatestPrice();
-        // Fiyat kullanımı ile ilgili daha fazla mantık ekleyebilirsiniz.
     }
 
     receive() external payable {}
@@ -78,7 +72,6 @@ contract AMMExample is IUniswapV2Callee, Ownable {
         require(targetToken != address(0), "Invalid target token address");
         require(uniswapRouter != IUniswapRouterV2(0), "Uniswap router is not set");
 
-        // Transfer the input tokens from the user to the contract
         require(token.transferFrom(msg.sender, address(this), tokenAmount), "Transfer failed");
         
         uint[] memory amounts = uniswapRouter.swapExactTokensForTokens(tokenAmount, 0, path, address(this), deadline);
